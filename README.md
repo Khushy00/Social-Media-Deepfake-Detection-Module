@@ -85,7 +85,7 @@ http://localhost:8000
 
 ## Author
 
-Khushi Saul
+Khushi 
 
 ---
 
