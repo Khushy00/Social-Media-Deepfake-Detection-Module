@@ -1,0 +1,208 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
+    --danger: #ef4444;
+    --success: #10b981;
+    --border-color: #334155;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.container {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #60a5fa, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.upload-section {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    transition: all 0.3s ease;
+    background-color: rgba(30, 41, 59, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-section.highlight {
+    border-color: var(--primary-color);
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    border: none;
+    font-size: 1rem;
+}
+
+.button[for="fileElem"] {
+    background-color: #334155;
+    color: #f8fafc;
+    margin-bottom: 1rem;
+}
+
+.button[for="fileElem"]:hover {
+    background-color: #475569;
+}
+
+.button.primary {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.button.primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.button.outline {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.button.outline:hover {
+    background-color: #334155;
+}
+
+.drag-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+#preview-container {
+    animation: fadeIn 0.3s ease-out;
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    object-fit: contain;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Loading Spinner */
+#loading {
+    margin: 3rem 0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 1.5rem auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Result Section */
+.result-card {
+    background-color: #0f172a;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+#result-section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+#result-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.label-badge {
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.label-badge.real {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.label-badge.fake {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.confidence-wrapper {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+#result-confidence {
+    font-weight: 700;
+    color: var(--text-color);
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Deepfake Detector</title>
+    <!-- Use Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Deepfake Detector</h1>
+            <p>Upload an image to detect if it's real or AI-generated.</p>
+        </header>
+
+        <main>
+            <div class="upload-section" id="drop-area">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <input type="file" id="fileElem" name="file" accept="image/*" style="display:none;">
+                    <label class="button" for="fileElem">Choose Image</label>
+                    <p class="drag-text">Or drag and drop an image here</p>
+                </form>
+                <div id="preview-container" class="hidden">
+                    <img id="image-preview" src="" alt="Image preview">
+                    <button class="button primary" id="analyze-btn">Analyze Image</button>
+                </div>
+            </div>
+            
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Analyzing image structure...</p>
+            </div>
+
+            <div id="result-section" class="hidden">
+                <h2>Analysis Result</h2>
+                <div class="result-card">
+                    <div id="result-label" class="label-badge"></div>
+                    <div class="confidence-wrapper">
+                        <span>Confidence: </span>
+                        <span id="result-confidence"></span>
+                    </div>
+                </div>
+                <button class="button outline" id="reset-btn">Analyze Another</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileElem = document.getElementById('fileElem');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('result-section');
+        const resultLabel = document.getElementById('result-label');
+        const resultConfidence = document.getElementById('result-confidence');
+        const resetBtn = document.getElementById('reset-btn');
+
+        let selectedFile = null;
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+        fileElem.addEventListener('change', (e) => handleFiles(e.target.files), false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                selectedFile = files[0];
+                showPreview(selectedFile);
+            }
+        }
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = function() {
+                imagePreview.src = reader.result;
+                previewContainer.classList.remove('hidden');
+                document.querySelector('#upload-form').classList.add('hidden');
+            }
+        }
+
+        analyzeBtn.addEventListener('click', () => {
+            if (!selectedFile) return;
+
+            // UI transitions
+            previewContainer.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.classList.add('hidden');
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    resetUI();
+                    return;
+                }
+
+                showResult(data);
+            })
+            .catch(error => {
+                loading.classList.add('hidden');
+                alert('Something went wrong during analysis.');
+                console.error('Error:', error);
+                resetUI();
+            });
+        });
+
+        function showResult(data) {
+            resultSection.classList.remove('hidden');
+            
+            let isFake = false;
+            let labelText = data.label.toLowerCase();
+            if (labelText.includes('fake') || labelText.includes('spoof') || labelText.includes('ai')) {
+                isFake = true;
+            }
+
+            resultLabel.textContent = isFake ? 'AI Generated / Deepfake' : 'Authentic / Real';
+            resultLabel.className = 'label-badge ' + (isFake ? 'fake' : 'real');
+            
+            resultConfidence.textContent = data.confidence + '%';
+        }
+
+        function resetUI() {
+            selectedFile = null;
+            fileElem.value = '';
+            document.querySelector('#upload-form').classList.remove('hidden');
+            previewContainer.classList.add('hidden');
+            resultSection.classList.add('hidden');
+            loading.classList.add('hidden');
+        }
+
+        resetBtn.addEventListener('click', resetUI);
+    </script>
+</body>
+</html>
